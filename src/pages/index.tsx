@@ -106,30 +106,31 @@ export default function Home() {
               transition={{ duration: 0.8 }}
               className="text-center relative z-10"
             >
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 mb-6">
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 mb-6 px-4">
                 The Future of Professional
-                <br />
+                <br className="hidden sm:block" />
                 Consultation is Here
               </h1>
-              <p className="max-w-2xl mx-auto text-xl text-gray-300 mb-10">
+              <p className="max-w-2xl mx-auto text-lg sm:text-xl text-gray-300 mb-10 px-4">
                 Join the waitlist for NexProLink and be among the first to experience
                 the next generation of professional consultation platform.
               </p>
               
               {/* Floating Images */}
-              <div className="relative h-80 my-16">
+              <div className="relative h-60 sm:h-80 my-8 sm:my-16">
                 {floatingImages.map((img, index) => (
                   <motion.div
                     key={index}
-                    className="absolute w-64 h-40 rounded-xl overflow-hidden shadow-2xl"
+                    className="absolute w-48 sm:w-64 h-32 sm:h-40 rounded-xl overflow-hidden shadow-2xl"
                     style={{
-                      left: `${20 + index * 30}%`,
+                      left: `${10 + index * 35}%`,
                       top: '50%',
                       zIndex: 3 - index,
+                      transform: `translateY(-50%) scale(${index === 0 ? 1 : 0.9 - index * 0.1})`,
                     }}
                     animate={{
-                      y: [-20, 0, -20],
-                      rotate: [0, index % 2 === 0 ? 3 : -3, 0],
+                      y: [-10, 10, -10],
+                      rotate: [0, index % 2 === 0 ? 2 : -2, 0],
                     }}
                     transition={{
                       duration: 6,
@@ -171,8 +172,8 @@ export default function Home() {
             </motion.div>
 
             {/* Features Grid */}
-            <div className="mt-32">
-              <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-20 sm:mt-32 px-4 sm:px-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
                 {features.map((feature, index) => (
                   <motion.div
                     key={feature.name}
@@ -184,8 +185,8 @@ export default function Home() {
                     className="relative group"
                   >
                     <motion.div
-                      className={`relative rounded-2xl p-6 bg-gray-800/50 border border-gray-700 backdrop-blur-sm overflow-hidden
-                        ${hoveredFeature === index ? 'scale-105' : 'scale-100'}`}
+                      className={`relative rounded-2xl p-4 sm:p-6 bg-gray-800/50 border border-gray-700 backdrop-blur-sm overflow-hidden
+                        ${hoveredFeature === index ? 'scale-102 sm:scale-105' : 'scale-100'}`}
                       transition={{ duration: 0.2 }}
                     >
                       <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`} />

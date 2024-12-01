@@ -28,39 +28,57 @@ export default function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const emailTemplate = generateEmailTemplate();
-    console.log('Email Template:', emailTemplate);
-    onClose();
-  };
-
-  const generateEmailTemplate = () => {
+    
     const selectedInterests = Object.entries(formData.interests)
       .filter(([key, value]) => value)
       .map(([key]) => key === 'other' ? formData.otherInterest : key)
       .join(', ');
 
-    const template = `
-Subject: Welcome to NexProLink Early Access
+    // Create email subject and body with proper line breaks
+    const subject = encodeURIComponent('NexProLink Early Access Registration');
+    const emailBody = [
+      'Dear NexProLink Team,',
+      '',
+      'I would like to join the NexProLink early access program.',
+      '',
+      'My Details:',
+      `- Name: ${formData.name}`,
+      `- Email: ${formData.email}`,
+      `- Role: ${formData.isClient ? 'Client' : ''}${formData.isConsultant ? ' Consultant' : ''}`,
+      `- Areas of Interest: ${selectedInterests}`,
+      '',
+      'I\'m excited to be part of the platform\'s early access program and looking forward to your response.',
+      '',
+      'Best regards,',
+      formData.name
+    ].join('%0D%0A'); // RFC-2368 line break
 
-Dear ${formData.name},
+    try {
+      // Create and open mailto link
+      const mailtoLink = `mailto:support@nexprolink.com?subject=${subject}&body=${emailBody}`;
+      
+      // For modern browsers
+      const mailtoUrl = new URL(mailtoLink);
+      window.location.href = mailtoUrl.href;
 
-Thank you for joining NexProLink's early access program! We're excited to have you on board.
-
-Your Profile:
-- Name: ${formData.name}
-- Email: ${formData.email}
-- Interests: ${selectedInterests}
-- Role: ${formData.isClient ? 'Client' : ''}${formData.isConsultant ? ' Consultant' : ''}
-
-Please note that NexProLink is a technology platform that facilitates connections between clients and consultants. While we provide the tools for seamless interaction, all professional relationships and agreements are directly between the parties involved.
-
-We'll keep you updated on our launch and provide early access to our platform.
-
-Best regards,
-The NexProLink Team
-    `;
-
-    return template;
+      // Fallback for older browsers
+      setTimeout(() => {
+        if (!document.hasFocus()) {
+          // Email client opened successfully
+          onClose();
+        } else {
+          // Fallback method
+          window.open(mailtoLink, '_self');
+          onClose();
+        }
+      }, 500);
+    } catch (error) {
+      console.error('Error opening email client:', error);
+      // Fallback for any errors
+      const mailtoLink = `mailto:support@nexprolink.com?subject=${subject}&body=${emailBody}`;
+      window.location.assign(mailtoLink);
+      onClose();
+    }
   };
 
   return (
@@ -89,8 +107,8 @@ The NexProLink Team
               leaveFrom="opacity-100 translate-y-0 sm:scale-100"
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
-              <Dialog.Panel className="relative transform overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 px-4 pb-4 pt-5 text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6 border border-gray-700">
-                <div className="absolute right-0 top-0 pr-4 pt-4">
+              <Dialog.Panel className="relative transform overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 px-4 pb-4 pt-5 text-left shadow-2xl transition-all w-[95vw] sm:my-8 sm:w-full sm:max-w-lg sm:p-6 border border-gray-700">
+                <div className="absolute right-0 top-0 pr-4 pt-4 sm:pr-6 sm:pt-6">
                   <button
                     type="button"
                     className="rounded-full p-1 text-gray-400 hover:text-gray-200 hover:bg-gray-700 transition-all duration-200"
@@ -103,7 +121,7 @@ The NexProLink Team
 
                 <div className="sm:flex sm:items-start">
                   <div className="mt-3 text-center sm:mt-0 sm:text-left w-full">
-                    <Dialog.Title as="h3" className="text-2xl font-semibold leading-6 text-white mb-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">
+                    <Dialog.Title as="h3" className="text-xl sm:text-2xl font-semibold leading-6 text-white mb-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">
                       Join Early Access
                     </Dialog.Title>
                     <p className="text-sm text-gray-300 mb-6">
@@ -177,9 +195,9 @@ The NexProLink Team
                       </div>
 
                       {/* Interest Areas */}
-                      <div className="rounded-xl bg-gray-800/30 p-4 border border-gray-700">
+                      <div className="rounded-xl bg-gray-800/30 p-3 sm:p-4 border border-gray-700">
                         <p className="text-sm font-medium text-gray-300 mb-3">Areas of Interest:</p>
-                        <div className="grid grid-cols-2 gap-3">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                           {Object.entries(formData.interests).map(([key, value]) => (
                             <label key={key} className="flex items-center group cursor-pointer">
                               <div className="relative">
