@@ -36,49 +36,65 @@ export default function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
 
     // Create email subject and body with proper line breaks
     const subject = encodeURIComponent('NexProLink Early Access Registration');
-    const emailBody = [
-      'Dear NexProLink Team,',
-      '',
-      'I would like to join the NexProLink early access program.',
-      '',
-      'My Details:',
-      `- Name: ${formData.name}`,
-      `- Email: ${formData.email}`,
-      `- Role: ${formData.isClient ? 'Client' : ''}${formData.isConsultant ? ' Consultant' : ''}`,
-      `- Areas of Interest: ${selectedInterests}`,
-      '',
-      'I\'m excited to be part of the platform\'s early access program and looking forward to your response.',
-      '',
-      'Best regards,',
-      formData.name
-    ].join('%0D%0A'); // RFC-2368 line break
+    const bodyText = `Dear NexProLink Team,
 
-    try {
-      // Create and open mailto link
-      const mailtoLink = `mailto:support@nexprolink.com?subject=${subject}&body=${emailBody}`;
-      
-      // For modern browsers
-      const mailtoUrl = new URL(mailtoLink);
-      window.location.href = mailtoUrl.href;
+I would like to join the NexProLink early access program.
 
-      // Fallback for older browsers
+My Details:
+- Name: ${formData.name}
+- Email: ${formData.email}
+- Role: ${formData.isClient ? 'Client' : ''}${formData.isConsultant ? ' Consultant' : ''}
+- Areas of Interest: ${selectedInterests}
+
+I'm excited to be part of the platform's early access program and looking forward to your response.
+
+Best regards,
+${formData.name}`;
+
+    const body = encodeURIComponent(bodyText);
+
+    // Create mailto link
+    const mailtoLink = `mailto:support@nexprolink.com?subject=${subject}&body=${body}`;
+
+    // Try multiple methods to open email client
+    const openEmail = () => {
+      // Method 1: Using window.location
+      try {
+        window.location.href = mailtoLink;
+      } catch (e) {
+        console.log('Method 1 failed, trying method 2');
+      }
+
+      // Method 2: Using window.open
       setTimeout(() => {
-        if (!document.hasFocus()) {
-          // Email client opened successfully
-          onClose();
-        } else {
-          // Fallback method
-          window.open(mailtoLink, '_self');
-          onClose();
+        try {
+          const opened = window.open(mailtoLink, '_blank');
+          if (!opened) {
+            console.log('Method 2 failed, trying method 3');
+            // Method 3: Create and click a temporary link
+            const link = document.createElement('a');
+            link.href = mailtoLink;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          }
+        } catch (e) {
+          console.error('Failed to open email client:', e);
+          // Method 4: Final fallback
+          window.location.assign(mailtoLink);
         }
-      }, 500);
-    } catch (error) {
-      console.error('Error opening email client:', error);
-      // Fallback for any errors
-      const mailtoLink = `mailto:support@nexprolink.com?subject=${subject}&body=${emailBody}`;
-      window.location.assign(mailtoLink);
+      }, 100);
+    };
+
+    // Execute email opening
+    openEmail();
+
+    // Close modal after a delay
+    setTimeout(() => {
       onClose();
-    }
+    }, 1000);
   };
 
   return (
