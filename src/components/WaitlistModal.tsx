@@ -2,6 +2,7 @@ import { Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { XMarkIcon } from '@heroicons/react/24/outline';
+import { submitToGoogleSheets } from '../utils/googleSheets';
 
 interface WaitlistModalProps {
   isOpen: boolean;
@@ -33,6 +34,14 @@ export default function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
       .filter(([key, value]) => value)
       .map(([key]) => key === 'other' ? formData.otherInterest : key)
       .join(', ');
+
+    // Submit to Google Sheets
+    await submitToGoogleSheets({
+      name: formData.name,
+      email: formData.email,
+      roles: `${formData.isClient ? 'Client' : ''}${formData.isConsultant ? ' Consultant' : ''}`,
+      interests: selectedInterests,
+    });
 
     // Create email subject and body with proper line breaks
     const subject = encodeURIComponent('NexProLink Early Access Registration');
